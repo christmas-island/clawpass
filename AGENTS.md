@@ -19,7 +19,7 @@ without parsing JSON.
 ├── Cargo.toml                 # crate metadata, deps (v0.2.0)
 ├── Cargo.lock                 # pinned dependency versions
 ├── src/
-│   └── main.rs                # entire implementation (~276 lines)
+│   └── main.rs                # entire implementation (single file)
 ├── schemas/                   # JSON Schema files for each command output
 │   ├── push.schema.json
 │   ├── pop.schema.json
@@ -74,7 +74,7 @@ clawpass pop "nonexistent"; echo "exit: $?"   # expect exit 2
 
 | Code | Constant | Meaning |
 |------|----------|---------|
-| `0` | `EXIT_OK` | Success, data returned on stdout |
+| `0` | — | Success, data returned on stdout |
 | `1` | `EXIT_VALIDATION` | Bad input (empty session_id or prompt) |
 | `2` | `EXIT_EMPTY` | No pending rows — normal "no work" condition |
 | `3` | `EXIT_STORAGE` | Database open/write/transaction failure |
@@ -140,10 +140,10 @@ precision, `+00:00` suffix — not `Z`).
 
 ## Common pitfalls
 
-- **list JSON is hand-constructed**: the outer `{"ok":true,"items":…}` on
-  line ~273 is a format string, not a Serialize struct. If you add fields,
-  update the format string manually.
-- **list empty has no session_id**: the empty response on line ~270 is a raw
+- **list JSON is hand-constructed**: the outer `{"ok":true,"items":…}` in the
+  `List` command arm is a format string, not a Serialize struct. If you add
+  fields to the wrapper, update the format string manually.
+- **list empty has no session_id**: the empty branch in `List` uses a raw
   string literal `{"ok":false,"reason":"empty"}`, not the EmptyResult struct.
 - **peek reuses PopResult struct**: peek returns a `PopResult` with
   `popped_at: None`. There is no separate PeekResult type.
