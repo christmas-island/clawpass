@@ -1,0 +1,13 @@
+[workspace]
+changelog_config = "cliff.toml"
+git_tag_enable = true
+git_release_enable = true
+git_release_draft = false
+
+[changelog]
+git_tag_name = "v{{ version }}"
+
+[[package]]
+name = "clawpass"
+changelog_update = true
+git_tag_name = "v{{ version }}"
