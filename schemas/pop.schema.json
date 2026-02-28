@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/christmas-island/clawpass/schemas/pop.schema.json",
+  "title": "clawpass pop output",
+  "description": "JSON written to stdout by the pop command. Shape depends on exit code.",
+  "oneOf": [
+    {
+      "title": "pop success (exit 0)",
+      "type": "object",
+      "properties": {
+        "ok": { "const": true },
+        "session_id": { "type": "string", "minLength": 1 },
+        "prompt": { "type": "string", "minLength": 1 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "popped_at": { "type": "string", "format": "date-time" },
+        "id": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["ok", "session_id", "prompt", "created_at", "popped_at", "id"],
+      "additionalProperties": false
+    },
+    {
+      "title": "pop empty (exit 2)",
+      "type": "object",
+      "properties": {
+        "ok": { "const": false },
+        "reason": { "const": "empty" },
+        "session_id": { "type": "string" }
+      },
+      "required": ["ok", "reason", "session_id"],
+      "additionalProperties": false
+    }
+  ]
+}
