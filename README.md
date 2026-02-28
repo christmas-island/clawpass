@@ -19,13 +19,40 @@ Session-scoped prompt handoff queue for [OpenClaw](https://github.com/christmas-
 
 ## Install
 
-### From source (cargo)
+### Quick install (Linux / macOS)
 
 ```bash
-cargo install --path .
+curl -fsSL https://raw.githubusercontent.com/christmas-island/clawpass/main/install.sh | sh
 ```
 
-Binary installs to `~/.cargo/bin/clawpass`.
+Override the install directory:
+
+```bash
+CLAWPASS_INSTALL_DIR=/usr/local/bin curl -fsSL https://raw.githubusercontent.com/christmas-island/clawpass/main/install.sh | sh
+```
+
+### Homebrew
+
+```bash
+brew tap christmas-island/tap
+brew install clawpass
+```
+
+### cargo binstall
+
+```bash
+cargo binstall clawpass
+```
+
+### cargo install
+
+```bash
+cargo install clawpass
+```
+
+### Manual download
+
+Pre-built binaries for Linux (x86_64, aarch64), macOS (x86_64, Apple Silicon), and Windows (x86_64) are available on the [GitHub Releases](https://github.com/christmas-island/clawpass/releases) page. Each archive includes a `.sha256` checksum file.
 
 ### From releases
 
