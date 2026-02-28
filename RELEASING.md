@@ -6,12 +6,22 @@ versioning and releases, driven by
 
 ## How it works
 
+The release pipeline has two stages with clear ownership:
+
+| Stage | Workflow | Trigger | Responsibility |
+|-------|----------|---------|----------------|
+| **Versioning** | `release-plz.yml` | Push to `main` | Version bump, CHANGELOG, git tag |
+| **Artifacts** | `release.yml` | Tag push (`v*`) | Cross-compile binaries, create GitHub Release |
+
+### Flow
+
 1. **Write conventional commits** on feature branches.
-2. **Merge to `main`** — the release-plz GitHub Action runs automatically.
-3. **release-plz opens a release PR** that bumps the version in `Cargo.toml`,
-   updates `CHANGELOG.md` (via git-cliff), and prepares a git tag.
-4. **Merge the release PR** — release-plz creates a GitHub release with the tag
-   `v<version>`.
+2. **Merge to `main`** — `release-plz.yml` runs automatically.
+3. **release-plz opens a release PR** that bumps the version in `Cargo.toml`
+   and updates `CHANGELOG.md` (via git-cliff).
+4. **Merge the release PR** — release-plz creates a git tag (`v<version>`).
+5. **Tag push triggers `release.yml`** — builds cross-platform binaries and
+   creates the GitHub Release with artifacts attached.
 
 ## Conventional commits and version bumps
 

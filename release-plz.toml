@@ -1,8 +1,9 @@
 [workspace]
 changelog_config = "cliff.toml"
+# release-plz creates the git tag; release.yml (triggered by v* tags)
+# handles GitHub Release creation with cross-compiled binaries attached.
 git_tag_enable = true
-git_release_enable = true
-git_release_draft = false
+git_release_enable = false
 
 [changelog]
 git_tag_name = "v{{ version }}"
@@ -11,3 +12,5 @@ git_tag_name = "v{{ version }}"
 name = "clawpass"
 changelog_update = true
 git_tag_name = "v{{ version }}"
+# Not publishing to crates.io
+publish = false

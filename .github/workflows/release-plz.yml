@@ -26,4 +26,6 @@ jobs:
         uses: MarcoIeni/release-plz-action@v0.5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          # Not publishing to crates.io — no CARGO_REGISTRY_TOKEN needed.
+          # release-plz creates the version tag (v*), which triggers
+          # the release.yml workflow to build cross-platform binaries.
