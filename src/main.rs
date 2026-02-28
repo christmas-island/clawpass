@@ -1,18 +1,21 @@
 use chrono::Utc;
 use clap::{Parser, Subcommand};
-use rusqlite::{Connection, TransactionBehavior, params};
+use rusqlite::{params, Connection, TransactionBehavior};
 use serde::Serialize;
 use std::path::PathBuf;
 use std::process;
 
 // Exit codes per contract
-const EXIT_OK: i32 = 0;
 const EXIT_VALIDATION: i32 = 1;
 const EXIT_EMPTY: i32 = 2;
 const EXIT_STORAGE: i32 = 3;
 
 #[derive(Parser)]
-#[command(name = "clawpass", version, about = "Session-scoped prompt handoff queue")]
+#[command(
+    name = "clawpass",
+    version,
+    about = "Session-scoped prompt handoff queue"
+)]
 struct Cli {
     /// Path to SQLite database (default: ~/.openclaw/clawpass.db)
     #[arg(long, env = "CLAWPASS_DB")]
@@ -141,7 +144,12 @@ fn main() {
                     process::exit(EXIT_STORAGE);
                 }
             };
-            let result = PushResult { ok: true, session_id, created_at: now, id };
+            let result = PushResult {
+                ok: true,
+                session_id,
+                created_at: now,
+                id,
+            };
             println!("{}", serde_json::to_string(&result).unwrap());
         }
 
@@ -179,8 +187,12 @@ fn main() {
                         process::exit(EXIT_STORAGE);
                     });
                     let out = PopResult {
-                        ok: true, session_id, prompt, created_at,
-                        popped_at: Some(now), id,
+                        ok: true,
+                        session_id,
+                        prompt,
+                        created_at,
+                        popped_at: Some(now),
+                        id,
                     };
                     println!("{}", serde_json::to_string(&out).unwrap());
                 }
@@ -212,8 +224,12 @@ fn main() {
             match result {
                 Some((id, prompt, created_at)) => {
                     let out = PopResult {
-                        ok: true, session_id, prompt, created_at,
-                        popped_at: None, id,
+                        ok: true,
+                        session_id,
+                        prompt,
+                        created_at,
+                        popped_at: None,
+                        id,
                     };
                     println!("{}", serde_json::to_string(&out).unwrap());
                 }
@@ -231,11 +247,13 @@ fn main() {
 
         Commands::List { session_id } => {
             let items: Vec<ListItem> = if let Some(ref sid) = session_id {
-                let mut stmt = conn.prepare(
-                    "SELECT id, session_id, prompt, created_at FROM handoffs
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT id, session_id, prompt, created_at FROM handoffs
                      WHERE session_id = ?1 AND popped_at IS NULL
                      ORDER BY created_at ASC, id ASC",
-                ).unwrap();
+                    )
+                    .unwrap();
                 stmt.query_map(params![sid], |row| {
                     Ok(ListItem {
                         id: row.get(0)?,
@@ -248,11 +266,13 @@ fn main() {
                 .filter_map(|r| r.ok())
                 .collect()
             } else {
-                let mut stmt = conn.prepare(
-                    "SELECT id, session_id, prompt, created_at FROM handoffs
+                let mut stmt = conn
+                    .prepare(
+                        "SELECT id, session_id, prompt, created_at FROM handoffs
                      WHERE popped_at IS NULL
                      ORDER BY created_at ASC, id ASC",
-                ).unwrap();
+                    )
+                    .unwrap();
                 stmt.query_map([], |row| {
                     Ok(ListItem {
                         id: row.get(0)?,
@@ -270,7 +290,10 @@ fn main() {
                 println!("{{\"ok\":false,\"reason\":\"empty\"}}");
                 process::exit(EXIT_EMPTY);
             }
-            println!("{{\"ok\":true,\"items\":{}}}", serde_json::to_string(&items).unwrap());
+            println!(
+                "{{\"ok\":true,\"items\":{}}}",
+                serde_json::to_string(&items).unwrap()
+            );
         }
     }
 }
