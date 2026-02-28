@@ -113,8 +113,9 @@ main() {
     ext="zip"
   fi
 
-  local archive="${BINARY}-${version}-${target}.${ext}"
-  local checksum_file="${BINARY}-${version}-${target}.${ext}.sha256"
+  # Artifact naming matches release.yml: clawpass-<target>.<ext>
+  local archive="${BINARY}-${target}.${ext}"
+  local checksum_file="${BINARY}-${target}.sha256"
   local base_url="https://github.com/${REPO}/releases/download/${version}"
 
   local tmpdir
