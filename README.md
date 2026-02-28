@@ -4,6 +4,7 @@
 [![CI](https://github.com/christmas-island/clawpass/actions/workflows/ci.yml/badge.svg)](https://github.com/christmas-island/clawpass/actions/workflows/ci.yml)
 [![Crate Version](https://img.shields.io/crates/v/clawpass)](https://crates.io/crates/clawpass)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![codecov](https://codecov.io/gh/christmas-island/clawpass/graph/badge.svg)](https://codecov.io/gh/christmas-island/clawpass)
 
 Session-scoped prompt handoff queue for [OpenClaw](https://github.com/christmas-island) agents. Backed by SQLite.
 
