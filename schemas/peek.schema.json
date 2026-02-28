@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/christmas-island/clawpass/schemas/peek.schema.json",
+  "title": "clawpass peek output",
+  "description": "JSON written to stdout by the peek command. Shape depends on exit code.",
+  "oneOf": [
+    {
+      "title": "peek success (exit 0)",
+      "type": "object",
+      "properties": {
+        "ok": { "const": true },
+        "session_id": { "type": "string", "minLength": 1 },
+        "prompt": { "type": "string", "minLength": 1 },
+        "created_at": { "type": "string", "format": "date-time" },
+        "popped_at": { "const": null },
+        "id": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["ok", "session_id", "prompt", "created_at", "popped_at", "id"],
+      "additionalProperties": false
+    },
+    {
+      "title": "peek empty (exit 2)",
+      "type": "object",
+      "properties": {
+        "ok": { "const": false },
+        "reason": { "const": "empty" },
+        "session_id": { "type": "string" }
+      },
+      "required": ["ok", "reason", "session_id"],
+      "additionalProperties": false
+    }
+  ]
+}

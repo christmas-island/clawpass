@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/christmas-island/clawpass/schemas/push.schema.json",
+  "title": "clawpass push output",
+  "description": "JSON written to stdout on exit code 0 after a successful push.",
+  "type": "object",
+  "properties": {
+    "ok": { "const": true },
+    "session_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The session identifier that was pushed to."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "RFC 3339 timestamp of insertion (UTC, nanosecond precision, +00:00 suffix)."
+    },
+    "id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "SQLite AUTOINCREMENT row id."
+    }
+  },
+  "required": ["ok", "session_id", "created_at", "id"],
+  "additionalProperties": false
+}
