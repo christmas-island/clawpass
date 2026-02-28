@@ -4,6 +4,13 @@ version = "0.2.0"
 edition = "2021"
 description = "Session-scoped prompt handoff queue for OpenClaw agents"
 
+[package.metadata.binstall]
+pkg-url = "{ repo }/releases/download/v{ version }/clawpass-{ target }.{ archive-format }"
+pkg-fmt = "tgz"
+
+[package.metadata.binstall.overrides.x86_64-pc-windows-msvc]
+pkg-fmt = "zip"
+
 [dependencies]
 clap = { version = "4", features = ["derive", "env"] }
 rusqlite = { version = "0.31", features = ["bundled"] }
