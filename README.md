@@ -152,6 +152,41 @@ else
 fi
 ```
 
+## Development
+
+### Prerequisites
+
+- Rust toolchain (rustup)
+- [pre-commit](https://pre-commit.com/) (`pip install pre-commit` or `brew install pre-commit`)
+
+### Setup
+
+```bash
+pre-commit install
+pre-commit install --hook-type commit-msg
+```
+
+### Make targets
+
+```bash
+make fmt    # run rustfmt
+make lint   # run clippy with -D warnings
+make check  # run cargo check
+make test   # run cargo test
+```
+
+### Commit conventions
+
+This project uses [Conventional Commits](https://www.conventionalcommits.org/). Commit messages are enforced by a pre-commit hook.
+
+Examples:
+```
+feat: add queue priority support
+fix: handle empty session_id in pop
+docs: update README with dev setup
+chore: bump dependencies
+```
+
 ## Troubleshooting
 
 ### `error: cannot open database`
