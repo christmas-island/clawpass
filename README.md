@@ -1,14 +1,40 @@
 # clawpass
 
-Session-scoped prompt handoff queue for OpenClaw agents. Backed by SQLite.
+<!-- Badges -->
+[![CI](https://github.com/christmas-island/clawpass/actions/workflows/ci.yml/badge.svg)](https://github.com/christmas-island/clawpass/actions/workflows/ci.yml)
+[![Crate Version](https://img.shields.io/crates/v/clawpass)](https://crates.io/crates/clawpass)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Session-scoped prompt handoff queue for [OpenClaw](https://github.com/christmas-island) agents. Backed by SQLite.
+
+## Features
+
+- **Session-scoped queues** — prompts are isolated by session ID, so multiple agents can share one database without interference.
+- **FIFO ordering** — `pop` always returns the oldest pending prompt.
+- **Race-safe pop** — uses `BEGIN IMMEDIATE` transactions to prevent double-pop under concurrent access.
+- **Soft deletes** — popped rows are marked with `popped_at` rather than deleted, preserving an audit trail.
+- **JSON-only stdout** — all output is machine-readable JSON; human diagnostics go to stderr.
+- **Defined exit codes** — scripts can branch reliably on exit status (0/1/2/3).
+- **Zero config** — works out of the box with a default database path; no server needed.
 
 ## Install
+
+### From source (cargo)
 
 ```bash
 cargo install --path .
 ```
 
 Binary installs to `~/.cargo/bin/clawpass`.
+
+### From releases
+
+Download a prebuilt binary from the [GitHub Releases](https://github.com/christmas-island/clawpass/releases) page, extract it, and place it on your `PATH`:
+
+```bash
+curl -fsSL https://github.com/christmas-island/clawpass/releases/latest/download/clawpass-$(uname -s)-$(uname -m).tar.gz \
+  | tar xz -C /usr/local/bin
+```
 
 ## Usage
 
@@ -19,8 +45,42 @@ clawpass peek <session_id>
 clawpass list [session_id]
 ```
 
-Override database path with `--db <path>` or `CLAWPASS_DB` env var.  
-Default: `~/.openclaw/clawpass.db`
+### Quick Example
+
+```bash
+# Push a prompt for a session
+clawpass push "agent:main:discord:123" "summarize the last 10 messages"
+
+# Pop the next prompt (returns it and marks consumed)
+clawpass pop "agent:main:discord:123"
+
+# Peek without consuming
+clawpass peek "agent:main:discord:123"
+
+# List all pending prompts
+clawpass list
+
+# List pending prompts for a specific session
+clawpass list "agent:main:discord:123"
+```
+
+## Configuration
+
+| Setting | Flag | Env var | Default |
+|---------|------|---------|---------|
+| Database path | `--db <path>` | `CLAWPASS_DB` | `~/.openclaw/clawpass.db` |
+
+The database file and parent directories are created automatically on first use.
+
+### Session ID Conventions
+
+Session IDs are arbitrary strings. The recommended convention is a colon-delimited path:
+
+```
+agent:<agent_name>:<platform>:<channel_or_context>:<id>
+```
+
+Examples: `agent:main:discord:channel:123`, `agent:worker:slack:thread:456`
 
 ## Behavior Spec (v0.2)
 
@@ -31,7 +91,7 @@ Default: `~/.openclaw/clawpass.db`
 - **`peek`** — Return the oldest pending row without modifying it.
 - **`list`** — Return all pending rows, optionally filtered by session.
 
-### Exit codes
+### Exit Codes
 
 | Code | Meaning |
 |------|---------|
@@ -40,7 +100,7 @@ Default: `~/.openclaw/clawpass.db`
 | `2`  | Empty / not found (normal no-work condition) |
 | `3`  | Storage / database error |
 
-### Output contract
+### Output Contract
 
 - **stdout:** JSON only (machine-readable)
 - **stderr:** diagnostics/errors only (human-readable)
@@ -75,15 +135,7 @@ Default: `~/.openclaw/clawpass.db`
 {"ok":false,"reason":"empty"}
 ```
 
-### Storage
-
-Default database path: `~/.openclaw/clawpass.db`
-
-Schema: `handoffs(id, session_id, prompt, created_at, popped_at)`
-
-Index: `idx_clawpass_pending ON handoffs(session_id, popped_at, created_at, id)`
-
-### Shell usage pattern
+### Shell Usage Pattern
 
 ```bash
 if clawpass pop "$SESSION_ID" > /tmp/handoff.json; then
@@ -100,6 +152,39 @@ else
 fi
 ```
 
+## Troubleshooting
+
+### `error: cannot open database`
+
+The database path is not writable, or the parent directory doesn't exist and can't be created.
+
+- Check permissions on the directory: `ls -la ~/.openclaw/`
+- Try an explicit path: `clawpass --db /tmp/test.db list`
+
+### `error: session_id must not be empty`
+
+You passed an empty string as the session ID. Make sure to quote your arguments:
+
+```bash
+clawpass push "$SESSION_ID" "$PROMPT"
+```
+
+### Pop returns exit code 2 but I expected data
+
+Exit code 2 means the queue is empty for that session. This is a normal "no work" condition, not an error. Check your session ID matches what was used for `push`.
+
+### Database locked errors under concurrency
+
+clawpass uses `BEGIN IMMEDIATE` for `pop` to serialize concurrent access. If you see locking errors, ensure you're not holding long-lived connections to the same database from another process. SQLite handles short transactions well but is not designed for high-concurrency workloads.
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for design decisions and internals.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
 ## License
 
-MIT
+[MIT](LICENSE)
